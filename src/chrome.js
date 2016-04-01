@@ -3,17 +3,28 @@
 // cf.: https://babeljs.io/docs/usage/polyfill
 import "babel-polyfill";
 
-export function eventPageOnClickListener(cb) {
-    chrome.browserAction.onClicked.addListener(cb);
-}
-
-export function contentScriptDoIt() {
-    //chrome.runtime.sendMessage("Allo' Allo' World!");
-    chrome.runtime.sendMessage(document.getElementsByTagName("title")[0].innerText);
-}
-
-export function backgroundDoIt() {
-    chrome.runtime.onMessage.addListener((response, sender, sendResponse) => {
-        alert(response);
+export function getTabsByBrowserActionOnClickListener() {
+    return new Promise((resolve) => {
+        chrome.browserAction.onClicked.addListener((tabs) => { resolve(tabs); });
     });
 }
+export const browserActionOnClickedAddListener = getTabsByBrowserActionOnClickListener;
+
+
+export function sendRuntimeMessage(message) {
+    return new Promise((resolve) => {
+        chrome.runtime.sendMessage(undefined, message, undefined, () => { resolve(true); });
+    });
+}
+export const runtimeSendMessage = sendRuntimeMessage;
+
+
+export function getResponseByRuntimeOnMessageListener() {
+    return new Promise((resolve) => {
+        chrome.runtime.onMessage.addListener((response) => { resolve(response); });
+        //(response, sender, sendResponse) => {
+        //    alert(response);
+        //}
+    });
+}
+export const runtimeOnMessageAddListener = getResponseByRuntimeOnMessageListener;
